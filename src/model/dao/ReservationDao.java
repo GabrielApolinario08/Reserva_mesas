@@ -6,7 +6,7 @@ public interface ReservationDao {
     void insert(Reservation reservation);
     void delete(Reservation reservation);
     void update(Reservation reservation);
-    Reservation findById(Long id);
+    Reservation findById(int id);
     Reservation findAll();
 
 }

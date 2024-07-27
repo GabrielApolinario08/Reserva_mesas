@@ -3,7 +3,7 @@ package model.entities;
 import java.util.Objects;
 
 public class Table {
-    private Long id;
+    private Integer id;
     private Integer number;
     private Integer capacity;
 
@@ -13,17 +13,17 @@ public class Table {
         setCapacity(null);
     }
 
-    public Table(Long id, Integer number, Integer capacity) {
+    public Table(Integer id, Integer number, Integer capacity) {
         setId(id);
         setNumber(number);
         setCapacity(capacity);
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

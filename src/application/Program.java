@@ -7,9 +7,7 @@ import model.entities.Table;
 
 public class Program {
     public static void main(String[] args) {
-        DB.getConnection();
-        DaoFactory.getReservationDao().insert(new Reservation());
-        DaoFactory.getTableDao().insert(new Table());
-        DB.closeConnection();
+        Reservation reservation = DaoFactory.getReservationDao().findById(1);
+        System.out.println(reservation);
     }
 }

@@ -28,7 +28,7 @@ public class TableDaoJDBC implements TableDao {
     }
 
     @Override
-    public Table findById(Long id) {
+    public Table findById(int id) {
         return null;
     }
 

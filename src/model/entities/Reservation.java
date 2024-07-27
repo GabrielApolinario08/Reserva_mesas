@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class Reservation {
-    private Long id;
+    private Integer id;
     private String clientName;
     private Integer peopleNumber;
     private LocalDate date;
@@ -18,7 +18,7 @@ public class Reservation {
         setTable(null);
     }
 
-    public Reservation(Long id, String clientName, Integer peopleNumber, LocalDate date, Table table) {
+    public Reservation(Integer id, String clientName, Integer peopleNumber, LocalDate date, Table table) {
         setId(id);
         setClientName(clientName);
         setPeopleNumber(peopleNumber);
@@ -26,11 +26,11 @@ public class Reservation {
         setTable(table);
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

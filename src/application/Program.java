@@ -18,5 +18,7 @@ public class Program {
         }*/
         Reservation reservation = new Reservation("Maria", 6, new Date(), new Table(1));
         DaoFactory.getReservationDao().insert(reservation);
+
+        DaoFactory.getReservationDao().update(new Reservation(18, "Maria Helena", 5, new Date(), new Table(8, 5, 20)));
     }
 }

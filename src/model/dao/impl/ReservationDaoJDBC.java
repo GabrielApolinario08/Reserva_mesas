@@ -56,7 +56,27 @@ public class ReservationDaoJDBC implements ReservationDao {
 
     @Override
     public void update(Reservation reservation) {
-
+        PreparedStatement st = null;
+        try {
+            st = conn.prepareStatement("""
+                    UPDATE reservation 
+                    SET ClientName = ?, ReservationDate = ?, PeopleNumber = ?, IdTable = ? 
+                    WHERE Id = ?
+                    """);
+            st.setString(1, reservation.getClientName());
+            st.setDate(2, new Date(reservation.getDate().getTime()));
+            st.setInt(3, reservation.getPeopleNumber());
+            st.setInt(4, reservation.getTable().getId());
+            st.setInt(5, reservation.getId());
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected <= 0) {
+                throw new DbException("Erro inesperado! Não foi possível inserir os novos dados.");
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+        }
     }
 
     @Override

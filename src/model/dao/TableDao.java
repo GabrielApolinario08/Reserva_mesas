@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TableDao {
     void insert(Table reservation);
-    void delete(Table reservation);
+    void deleteById(Integer id);
     void update(Table reservation);
     Table findById(int id);
     List<Table> findAll();

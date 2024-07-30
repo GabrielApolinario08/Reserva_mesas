@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReservationDaoJDBC implements ReservationDao {
 
@@ -48,7 +50,6 @@ public class ReservationDaoJDBC implements ReservationDao {
             );
             st.setInt(1, id);
             rs = st.executeQuery();
-            Reservation reservation = new Reservation();
             if (rs.next()) {
                 Table table = instanciateTable(rs);
                 return instanciateReservation(rs, table);
@@ -64,8 +65,28 @@ public class ReservationDaoJDBC implements ReservationDao {
     }
 
     @Override
-    public Reservation findAll() {
-        return null;
+    public List<Reservation> findAll() {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = conn.prepareStatement("""
+                    SELECT reservation.*, restauranttable.* 
+                    FROM reservation 
+                    INNER JOIN restauranttable 
+                    ON reservation.IdTable = restauranttable.Id
+                    """);
+            rs = st.executeQuery();
+            List<Reservation> reservations = new ArrayList<>();
+            while (rs.next()) {
+                reservations.add(instanciateReservation(rs, instanciateTable(rs)));
+            }
+            return reservations;
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeResultSet(rs);
+            DB.closeStatement(st);
+        }
     }
 
     private Table instanciateTable(ResultSet rs) throws SQLException{

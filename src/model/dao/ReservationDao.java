@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ReservationDao {
     void insert(Reservation reservation);
-    void delete(Reservation reservation);
+    void deleteById(Integer id);
     void update(Reservation reservation);
     Reservation findById(int id);
     List<Reservation> findAll();

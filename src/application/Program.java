@@ -16,9 +16,10 @@ public class Program {
         for (Reservation reser:DaoFactory.getReservationDao().findAll()) {
             System.out.println(reser.getClientName());
         }*/
-        Reservation reservation = new Reservation("Maria", 6, new Date(), new Table(1));
-        DaoFactory.getReservationDao().insert(reservation);
+       /* Reservation reservation = new Reservation("Maria", 6, new Date(), new Table(1));
+        DaoFactory.getReservationDao().insert(reservation);*/
 
-        DaoFactory.getReservationDao().update(new Reservation(18, "Maria Helena", 5, new Date(), new Table(8, 5, 20)));
+        /*DaoFactory.getReservationDao().update(new Reservation(18, "Maria Helena", 5, new Date(), new Table(8, 5, 20)));*/
+        DaoFactory.getReservationDao().deleteById(21);
     }
 }

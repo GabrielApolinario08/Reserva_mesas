@@ -15,7 +15,7 @@ import java.util.List;
 
 public class TableDaoJDBC implements TableDao {
 
-    private Connection conn = null;
+    private final Connection conn;
     public TableDaoJDBC() {
         this.conn = DB.getConnection();
     }
@@ -57,7 +57,26 @@ public class TableDaoJDBC implements TableDao {
 
     @Override
     public void update(Table reservation) {
-
+        PreparedStatement st = null;
+        try {
+            st = conn.prepareStatement("""
+                    UPDATE restauranttable 
+                    SET Number = ?, Capacity = ? 
+                    WHERE id = ?
+                    """
+            );
+            st.setInt(1, reservation.getNumber());
+            st.setInt(2, reservation.getCapacity());
+            st.setInt(3, reservation.getId());
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected <= 0) {
+                throw new DbException("Erro inesperado! Não foi possível inserir os novos dados.");
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+        }
     }
 
     @Override

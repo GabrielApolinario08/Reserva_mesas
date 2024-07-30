@@ -14,6 +14,8 @@ public class Program {
         System.out.println(table);
         System.out.println(DaoFactory.getTableDao().findAll());
 
-        DaoFactory.getTableDao().insert(new Table(null, 10, 10));
+        Table table1 = new Table(10, 20, 30);
+        DaoFactory.getTableDao().update(table1);
+        System.out.println(table1);
     }
 }

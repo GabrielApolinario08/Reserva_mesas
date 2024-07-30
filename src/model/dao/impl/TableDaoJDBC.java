@@ -21,7 +21,33 @@ public class TableDaoJDBC implements TableDao {
     }
     @Override
     public void insert(Table reservation) {
-        System.out.println("DEU CEROT");
+        PreparedStatement st = null;
+        try {
+            st = conn.prepareStatement("""
+                    INSERT into restauranttable 
+                    (Number, Capacity) 
+                    VALUES
+                    (?, ?)
+                    """, st.RETURN_GENERATED_KEYS
+            );
+            st.setInt(1, reservation.getNumber());
+            st.setInt(2, reservation.getCapacity());
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                ResultSet rs = st.getGeneratedKeys();
+                if (rs.next()) {
+                    reservation.setId(rs.getInt(1));
+                }
+                DB.closeResultSet(rs);
+            } else {
+                throw new DbException("Erro inesperado! Não foi possível inserir os dados.");
+            }
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+        }
     }
 
     @Override

@@ -13,6 +13,12 @@ public class Table {
         setCapacity(null);
     }
 
+    public Table(Integer id) {
+        setId(id);
+        setNumber(null);
+        setCapacity(null);
+    }
+
     public Table(Integer id, Integer number, Integer capacity) {
         setId(id);
         setNumber(number);

@@ -1,13 +1,14 @@
 package model.entities;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Objects;
 
 public class Reservation {
     private Integer id;
     private String clientName;
     private Integer peopleNumber;
-    private LocalDate date;
+    private java.util.Date date;
     private Table table;
 
     public Reservation() {
@@ -18,8 +19,16 @@ public class Reservation {
         setTable(null);
     }
 
-    public Reservation(Integer id, String clientName, Integer peopleNumber, LocalDate date, Table table) {
+    public Reservation(Integer id, String clientName, Integer peopleNumber, java.util.Date date, Table table) {
         setId(id);
+        setClientName(clientName);
+        setPeopleNumber(peopleNumber);
+        setDate(date);
+        setTable(table);
+    }
+
+    public Reservation(String clientName, Integer peopleNumber, java.util.Date date, Table table) {
+        setId(null);
         setClientName(clientName);
         setPeopleNumber(peopleNumber);
         setDate(date);
@@ -50,11 +59,11 @@ public class Reservation {
         this.peopleNumber = peopleNumber;
     }
 
-    public LocalDate getDate() {
+    public java.util.Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

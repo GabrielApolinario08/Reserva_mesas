@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ReservationDaoJDBC implements ReservationDao {
 
-    private Connection conn = null;
+    private final Connection conn;
 
     public ReservationDaoJDBC() {
         this.conn = DB.getConnection();

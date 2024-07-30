@@ -12,5 +12,6 @@ public class Program {
     public static void main(String[] args) {
         Table table = DaoFactory.getTableDao().findById(4);
         System.out.println(table);
+        System.out.println(DaoFactory.getTableDao().findAll());
     }
 }

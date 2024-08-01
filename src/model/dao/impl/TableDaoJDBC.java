@@ -2,6 +2,7 @@ package model.dao.impl;
 
 import db.DB;
 import db.DbException;
+import model.dao.DaoFactory;
 import model.dao.TableDao;
 import model.entities.Reservation;
 import model.entities.Table;
@@ -132,6 +133,26 @@ public class TableDaoJDBC implements TableDao {
             DB.closeStatement(st);
             DB.closeResultSet(rs);
         }
+    }
+
+    @Override
+    public boolean existNumber(Integer number) {
+        for (Table table:DaoFactory.getTableDao().findAll()) {
+            if (number == table.getNumber()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Table findByNumber(int number) {
+        for (Table table:DaoFactory.getTableDao().findAll()) {
+            if (number == table.getNumber()) {
+                return table;
+            }
+        }
+        return null;
     }
 
     private Table instanciateTable(ResultSet rs) throws SQLException{

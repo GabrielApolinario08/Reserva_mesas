@@ -19,6 +19,12 @@ public class Table {
         setCapacity(null);
     }
 
+    public Table(Integer number, Integer capacity) {
+        setId(null);
+        setNumber(number);
+        setCapacity(capacity);
+    }
+
     public Table(Integer id, Integer number, Integer capacity) {
         setId(id);
         setNumber(number);

@@ -29,7 +29,8 @@ public class ReservationDaoJDBC implements ReservationDao {
                     """, st.RETURN_GENERATED_KEYS
             );
             st.setString(1, reservation.getClientName());
-            st.setDate(2, new Date(reservation.getDate().getTime()));
+            Timestamp timestamp = Timestamp.valueOf(reservation.getDate());
+            st.setTimestamp(2, timestamp);
             st.setInt(3, reservation.getPeopleNumber());
             st.setInt(4, reservation.getTable().getId());
             int rowsAffected = st.executeUpdate();
@@ -73,7 +74,8 @@ public class ReservationDaoJDBC implements ReservationDao {
                     WHERE Id = ?
                     """);
             st.setString(1, reservation.getClientName());
-            st.setDate(2, new Date(reservation.getDate().getTime()));
+            Timestamp timestamp = Timestamp.valueOf(reservation.getDate().toString());
+            st.setTimestamp(2, timestamp);
             st.setInt(3, reservation.getPeopleNumber());
             st.setInt(4, reservation.getTable().getId());
             st.setInt(5, reservation.getId());
@@ -150,7 +152,7 @@ public class ReservationDaoJDBC implements ReservationDao {
         Reservation reservation = new Reservation();
         reservation.setId(rs.getInt("Id"));
         reservation.setClientName(rs.getString("ClientName"));
-        reservation.setDate(rs.getDate("ReservationDate"));
+        reservation.setDate(rs.getTimestamp("ReservationDate").toLocalDateTime());
         reservation.setPeopleNumber(rs.getInt("PeopleNumber"));
         reservation.setTable(table);
         return reservation;

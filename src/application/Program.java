@@ -1,41 +1,96 @@
 package application;
 
 import db.DB;
+import model.dao.DaoFactory;
+import model.entities.Reservation;
+import model.entities.Table;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Program {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        Scanner scannerString = new Scanner(System.in);
         int opc = 0;
         while (opc != 9){
             try {
                 System.out.println(UI.menu());
                 System.out.println("Escolha uma opção: ");
                 opc = scanner.nextInt();
-                System.out.println(opc);
                 if (opc < 1 || opc > 9) throw new ApplicationException("Erro! Digite um número válido!");
 
                 switch (opc) {
-                    case 1 -> System.out.println("1");
-                    case 2 -> System.out.println("2");
-                    case 3 -> System.out.println("3");
-                    case 4 -> System.out.println("4");
+                    case 1 -> registerTable(scanner);
+                    case 2 -> registerReservation(scanner, scannerString);
+                    case 3 -> listTables(scanner);
+                    case 4 -> listReservations(scanner);
                     case 5 -> System.out.println("5");
                     case 6 -> System.out.println("6");
                     case 7 -> System.out.println("7");
                     case 8 -> System.out.println("8");
                 }
             } catch (ApplicationException e) {
-                System.out.println("\t" + e.getMessage());
+                System.out.println("\n\t" + e.getMessage());
             } catch (InputMismatchException e) {
-                System.out.println("\tErro! Digite um número válido!");
+                System.out.println("\n\tErro! Digite um número válido!");
                 scanner.nextLine();
+            } catch (DateTimeParseException e) {
+                System.out.println("\n\tErro! Digite a data e hora corretamente!");
+            } finally {
+                scannerString.nextLine();
             }
 
         }
         DB.closeConnection();
         scanner.close();
+    }
+
+    static void registerTable(Scanner scanner) {
+        int number, capacity;
+        System.out.print("Informe o número da mesa: ");
+        number = scanner.nextInt();
+        if (DaoFactory.getTableDao().existNumber(number)) {
+            throw new ApplicationException("Número da mesa já existente.");
+        }
+        System.out.print("Informe a capacidade máxima da mesa: ");
+        capacity = scanner.nextInt();
+        if (capacity <= 0) {
+            throw new ApplicationException("Capacidade da mesa deve ser maior que 0.");
+        }
+
+        DaoFactory.getTableDao().insert(new Table(number, capacity));
+        System.out.println("Mesa cadastrada com sucesso!");
+    }
+
+    static void registerReservation(Scanner scanner, Scanner scannerString) {
+        String clientName;
+        LocalDateTime reservationDate;
+        int peopleNumber, tableNumber;
+        System.out.print("Informe o nome do cliente: ");
+        clientName = scannerString.nextLine();
+        System.out.print("Informe a data e hora da reserva (dd/mm/yyyy hh:mm): ");
+        reservationDate = LocalDateTime.parse(scannerString.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        System.out.print("Informe o número de pessoas da reserva: ");
+        peopleNumber = scanner.nextInt();
+        System.out.println("Informe o número da mesa escolhida: ");
+        tableNumber = scanner.nextInt();
+
+        if (!DaoFactory.getTableDao().existNumber(tableNumber)) throw new ApplicationException("Mesa não existente.");
+        Table table = DaoFactory.getTableDao().findByNumber(tableNumber);
+        if (peopleNumber > table.getCapacity()) throw new ApplicationException("Número de pessoas excede a capacidade da mesa.");
+        DaoFactory.getReservationDao().insert(new Reservation(clientName, peopleNumber, reservationDate, table));
+        System.out.println("Reserva cadastrada com sucesso!");
+    }
+
+    static void listTables(Scanner scanner) {
+
+    }
+
+    static void listReservations(Scanner scanner) {
+
     }
 }

@@ -15,11 +15,11 @@ public class Reservation {
     private Table table;
 
     public Reservation() {
-        setId(null);
-        setClientName(null);
-        setPeopleNumber(null);
-        setDate(null);
-        setTable(null);
+        this.id = null;
+        this.clientName = null;
+        this.peopleNumber = null;
+        this.date = null;
+        this.table = null;
     }
 
     public Reservation(Integer id, String clientName, Integer peopleNumber, LocalDateTime date, Table table) {

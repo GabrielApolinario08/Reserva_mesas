@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Program {
@@ -26,7 +27,7 @@ public class Program {
                 switch (opc) {
                     case 1 -> registerTable(scanner);
                     case 2 -> registerReservation(scanner, scannerString);
-                    case 3 -> listTables(scanner);
+                    case 3 -> listTables();
                     case 4 -> listReservations(scanner);
                     case 5 -> System.out.println("5");
                     case 6 -> System.out.println("6");
@@ -86,8 +87,12 @@ public class Program {
         System.out.println("Reserva cadastrada com sucesso!");
     }
 
-    static void listTables(Scanner scanner) {
-
+    static void listTables() {
+        System.out.println("Lista de todas as mesas: ");
+        List<Table> tables = DaoFactory.getTableDao().findAll();
+        for (Table table:tables) {
+            System.out.println(table);
+        }
     }
 
     static void listReservations(Scanner scanner) {

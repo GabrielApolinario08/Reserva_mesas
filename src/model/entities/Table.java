@@ -70,10 +70,6 @@ public class Table {
 
     @Override
     public String toString() {
-        return "Table{" +
-                "id=" + id +
-                ", number=" + number +
-                ", capacity=" + capacity +
-                '}';
+        return "Mesa " + getNumber() + ": Capacidade para "+ getCapacity() + " pessoas.";
     }
 }

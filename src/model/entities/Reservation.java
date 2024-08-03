@@ -4,6 +4,7 @@ import application.ApplicationException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 
@@ -95,12 +96,11 @@ public class Reservation {
 
     @Override
     public String toString() {
-        return "Reservation{" +
-                "id=" + id +
-                ", clientName='" + clientName + '\'' +
-                ", peopleNumber=" + peopleNumber +
-                ", date=" + date +
-                ", table=" + table +
-                '}';
+        return "\n=======Reserva=======\n" +
+                "Mesa: " + getTable().getNumber() +
+                "\nData: " + getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) +
+                "\nCliente: " + getClientName() +
+                "\nNúmero de pessoas: " + getPeopleNumber() +
+                "\n=====================";
     }
 }

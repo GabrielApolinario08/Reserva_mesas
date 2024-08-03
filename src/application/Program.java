@@ -28,11 +28,11 @@ public class Program {
                     case 1 -> registerTable(scanner);
                     case 2 -> registerReservation(scanner, scannerString);
                     case 3 -> listTables();
-                    case 4 -> listReservations(scanner);
-                    case 5 -> System.out.println("5");
-                    case 6 -> System.out.println("6");
-                    case 7 -> System.out.println("7");
-                    case 8 -> System.out.println("8");
+                    case 4 -> listReservations();
+                    case 5 -> updateTable();
+                    case 6 -> uptadeReservation();
+                    case 7 -> deleteTable();
+                    case 8 -> deleteReservation();
                 }
             } catch (ApplicationException e) {
                 System.out.println("\n\t" + e.getMessage());
@@ -49,7 +49,6 @@ public class Program {
         DB.closeConnection();
         scanner.close();
     }
-
     static void registerTable(Scanner scanner) {
         int number, capacity;
         System.out.print("Informe o número da mesa: ");
@@ -95,7 +94,24 @@ public class Program {
         }
     }
 
-    static void listReservations(Scanner scanner) {
+    static void listReservations() {
+        System.out.println("Lista de todas as reservas: ");
+        List<Reservation> reservations = DaoFactory.getReservationDao().findAll();
+        for (Reservation reservation:reservations) {
+            System.out.println(reservation);
+        }
+    }
+
+    static void updateTable() {
+
+    }
+    static void uptadeReservation() {
+
+    }
+    static void deleteTable() {
+
+    }
+    static void deleteReservation() {
 
     }
 }

@@ -29,7 +29,7 @@ public class Program {
                     case 2 -> registerReservation(scanner, scannerString);
                     case 3 -> listTables();
                     case 4 -> listReservations();
-                    case 5 -> updateTable();
+                    case 5 -> updateTable(scanner);
                     case 6 -> uptadeReservation();
                     case 7 -> deleteTable();
                     case 8 -> deleteReservation();
@@ -102,8 +102,30 @@ public class Program {
         }
     }
 
-    static void updateTable() {
+    static void updateTable(Scanner scanner) {
+        int number, capacity;
+        System.out.print("Informe o número da mesa: ");
+        number = scanner.nextInt();
 
+        if (!DaoFactory.getTableDao().existNumber(number)) {
+            throw new ApplicationException("Mesa não existente.");
+        }
+        Table table = DaoFactory.getTableDao().findByNumber(number);
+        System.out.println("Dados atuais da mesa: ");
+        System.out.println(table);
+        System.out.println("Informe os novos dados abaixo: ");
+        System.out.print("Número: ");
+        number = scanner.nextInt();
+        System.out.print("Capacidade máxima da mesa: ");
+        capacity = scanner.nextInt();
+        if (capacity <= 0) {
+            throw new ApplicationException("Capacidade da mesa deve ser maior que 0.");
+        }
+
+        DaoFactory.getTableDao().update(new Table(table.getId(), number, capacity));
+        System.out.println("Mesa atualizada com sucesso!");
+        System.out.println("Dados atualizados: ");
+        System.out.println(DaoFactory.getTableDao().findById(table.getId()));
     }
     static void uptadeReservation() {
 

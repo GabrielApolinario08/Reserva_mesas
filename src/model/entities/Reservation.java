@@ -103,4 +103,17 @@ public class Reservation {
                 "\nNúmero de pessoas: " + getPeopleNumber() +
                 "\n=====================";
     }
+
+    public String toString(Boolean withId) {
+        if (withId) {
+            return "\n=======Reserva=======\n" +
+                    "ID: " + getId() +
+                    "\nMesa: " + getTable().getNumber() +
+                    "\nData: " + getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) +
+                    "\nCliente: " + getClientName() +
+                    "\nNúmero de pessoas: " + getPeopleNumber() +
+                    "\n=====================";
+        }
+        return toString();
+    }
 }

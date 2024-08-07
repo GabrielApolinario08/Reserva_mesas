@@ -32,7 +32,7 @@ public class Program {
                     case 5 -> updateTable(scanner);
                     case 6 -> uptadeReservation(scanner, scannerString);
                     case 7 -> deleteTable(scanner);
-                    case 8 -> deleteReservation();
+                    case 8 -> deleteReservation(scanner);
                     case 9 -> System.out.println("Programa encerrado com sucesso!");
                 }
             } catch (ApplicationException e) {
@@ -134,13 +134,7 @@ public class Program {
         int peopleNumber, tableNumber, id;
         System.out.println("Lista de reservas: ");
         for (Reservation reservation:DaoFactory.getReservationDao().findAll()) {
-            System.out.println("\n=======Reserva=======\n" +
-                    "ID: " + reservation.getId() +
-                    "\nMesa: " + reservation.getTable().getNumber() +
-                    "\nData: " + reservation.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) +
-                    "\nCliente: " + reservation.getClientName() +
-                    "\nNúmero de pessoas: " + reservation.getPeopleNumber() +
-                    "\n=====================");
+            System.out.println(reservation.toString(true));
         }
         System.out.print("Informe o id da reserva que deseja atualizar: ");
         id = scanner.nextInt();
@@ -183,7 +177,18 @@ public class Program {
         DaoFactory.getTableDao().deleteById(table.getId());
         System.out.println("Mesa deletada com sucesso!");
     }
-    static void deleteReservation() {
-
+    static void deleteReservation(Scanner scanner) {
+        int id;
+        System.out.println("Lista de todas as reservas: ");
+        for (Reservation reservation:DaoFactory.getReservationDao().findAll()) {
+            System.out.println(reservation.toString(true));
+        }
+        System.out.print("ID da reserva que deseja deletar: ");
+        id = scanner.nextInt();
+        scanner.nextLine();
+        Reservation reservation = DaoFactory.getReservationDao().findById(id);
+        if (reservation == null) throw new ApplicationException("Reserva não existente.");
+        DaoFactory.getReservationDao().deleteById(id);
+        System.out.println("Reserva deletada com sucesso!");
     }
 }

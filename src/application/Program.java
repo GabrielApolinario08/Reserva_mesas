@@ -31,8 +31,9 @@ public class Program {
                     case 4 -> listReservations();
                     case 5 -> updateTable(scanner);
                     case 6 -> uptadeReservation(scanner, scannerString);
-                    case 7 -> deleteTable();
+                    case 7 -> deleteTable(scanner);
                     case 8 -> deleteReservation();
+                    case 9 -> System.out.println("Programa encerrado com sucesso!");
                 }
             } catch (ApplicationException e) {
                 System.out.println("\n\t" + e.getMessage());
@@ -42,7 +43,7 @@ public class Program {
             } catch (DateTimeParseException e) {
                 System.out.println("\n\tErro! Digite a data e hora corretamente!");
             } finally {
-                scannerString.nextLine();
+                if (opc != 9) scannerString.nextLine();
             }
 
         }
@@ -133,7 +134,13 @@ public class Program {
         int peopleNumber, tableNumber, id;
         System.out.println("Lista de reservas: ");
         for (Reservation reservation:DaoFactory.getReservationDao().findAll()) {
-            System.out.println("ID: " + reservation.getId() + reservation);
+            System.out.println("\n=======Reserva=======\n" +
+                    "ID: " + reservation.getId() +
+                    "\nMesa: " + reservation.getTable().getNumber() +
+                    "\nData: " + reservation.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) +
+                    "\nCliente: " + reservation.getClientName() +
+                    "\nNúmero de pessoas: " + reservation.getPeopleNumber() +
+                    "\n=====================");
         }
         System.out.print("Informe o id da reserva que deseja atualizar: ");
         id = scanner.nextInt();
@@ -149,7 +156,7 @@ public class Program {
         System.out.print("Número de pessoas: ");
         peopleNumber = scanner.nextInt();
         scanner.nextLine();
-        System.out.println("Número da mesa: ");
+        System.out.print("Número da mesa: ");
         tableNumber = scanner.nextInt();
         scanner.nextLine();
         if (!DaoFactory.getTableDao().existNumber(tableNumber)) throw new ApplicationException("Mesa não existente.");
@@ -162,8 +169,19 @@ public class Program {
         System.out.println("Dados atualizados: ");
         System.out.println(DaoFactory.getReservationDao().findById(id));
     }
-    static void deleteTable() {
-
+    static void deleteTable(Scanner scanner) {
+        int number;
+        System.out.println("Lista de todas as mesas: ");
+        for (Table table:DaoFactory.getTableDao().findAll()) {
+            System.out.println(table);
+        }
+        System.out.print("Número da mesa que deseja deletar: ");
+        number = scanner.nextInt();
+        scanner.nextLine();
+        if (!DaoFactory.getTableDao().existNumber(number)) throw new ApplicationException("Mesa não existente.");
+        Table table = DaoFactory.getTableDao().findByNumber(number);
+        DaoFactory.getTableDao().deleteById(table.getId());
+        System.out.println("Mesa deletada com sucesso!");
     }
     static void deleteReservation() {
 

@@ -74,7 +74,7 @@ public class ReservationDaoJDBC implements ReservationDao {
                     WHERE Id = ?
                     """);
             st.setString(1, reservation.getClientName());
-            Timestamp timestamp = Timestamp.valueOf(reservation.getDate().toString());
+            Timestamp timestamp = Timestamp.valueOf(reservation.getDate());
             st.setTimestamp(2, timestamp);
             st.setInt(3, reservation.getPeopleNumber());
             st.setInt(4, reservation.getTable().getId());

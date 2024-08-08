@@ -52,6 +52,7 @@ public class Reservation {
     }
 
     public void setClientName(String clientName) {
+        if (clientName.isEmpty()) throw new ApplicationException("Cliente deve ter nome.");
         this.clientName = clientName;
     }
 

@@ -96,9 +96,10 @@ public class ReservationDaoJDBC implements ReservationDao {
         ResultSet rs = null;
         try {
             st = conn.prepareStatement( """
-                    SELECT reservation.*, restauranttable.*
-                    FROM reservation
-                    INNER JOIN restauranttable
+                    SELECT reservation.Id AS reservationId, reservation.ClientName, reservation.ReservationDate, reservation.PeopleNumber, 
+                    restauranttable.Id AS tableId, restauranttable.Number, restauranttable.Capacity 
+                    FROM reservation 
+                    INNER JOIN restauranttable 
                     ON reservation.IdTable = restauranttable.Id
                     WHERE reservation.Id = ?
                     """

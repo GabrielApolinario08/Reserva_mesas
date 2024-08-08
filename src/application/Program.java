@@ -5,6 +5,7 @@ import model.dao.DaoFactory;
 import model.entities.Reservation;
 import model.entities.Table;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -84,11 +85,18 @@ public class Program {
         peopleNumber = scanner.nextInt();
         System.out.print("Informe o número da mesa escolhida: ");
         tableNumber = scanner.nextInt();
-
-        if (!DaoFactory.getTableDao().existNumber(tableNumber)) throw new ApplicationException("Mesa não existente.");
         Table table = DaoFactory.getTableDao().findByNumber(tableNumber);
-        if (peopleNumber > table.getCapacity()) throw new ApplicationException("Número de pessoas excede a capacidade da mesa.");
-        DaoFactory.getReservationDao().insert(new Reservation(clientName, peopleNumber, reservationDate, table));
+        Reservation reservation = new Reservation(clientName, peopleNumber, reservationDate, table);
+        validatingReservation(reservation);
+        if (checkEqualDays(reservation)) {
+            System.out.println("Já existe uma reserva nesta mesa e neste mesmo dia as " + reservation.getDate().format(DateTimeFormatter.ofPattern("HH:mm")) + ".");
+            String opc = wantToContinue();
+            if (opc.equals("n")) {
+                System.out.println("A reserva não foi cadastrada.");
+                return;
+            }
+        }
+        DaoFactory.getReservationDao().insert(reservation);
         System.out.println("Reserva cadastrada com sucesso!");
     }
 
@@ -158,15 +166,26 @@ public class Program {
         System.out.print("Número da mesa: ");
         tableNumber = scanner.nextInt();
         scanner.nextLine();
-        if (!DaoFactory.getTableDao().existNumber(tableNumber)) throw new ApplicationException("Mesa não existente.");
         Table table = DaoFactory.getTableDao().findByNumber(tableNumber);
-        if (peopleNumber > table.getCapacity()) throw new ApplicationException("Número de pessoas excede a capacidade da mesa.");
-
-
-        DaoFactory.getReservationDao().update(new Reservation(id, clientName, peopleNumber, reservationDate, table));
+        Reservation finalReservation = new Reservation(id, clientName, peopleNumber, reservationDate, table);
+        validatingReservation(finalReservation);
+        if (checkEqualDays(reservation)) {
+            System.out.println("Já existe uma reserva nesta mesa e neste mesmo dia as " + reservation.getDate().format(DateTimeFormatter.ofPattern("HH:mm")) + ".");
+            String opc = wantToContinue();
+            if (opc.equals("n")) {
+                System.out.println("A reserva não foi atualizada.");
+                return;
+            }
+        }
+        DaoFactory.getReservationDao().update(finalReservation);
         System.out.println("Reserva atualizada com sucesso!");
         System.out.println("Dados atualizados: ");
         System.out.println(DaoFactory.getReservationDao().findById(id));
+    }
+
+    static void validatingReservation(Reservation reservation) {
+        if (reservation.getTable() == null) throw new ApplicationException("Mesa não existente.");
+        if (reservation.getPeopleNumber() > reservation.getTable().getCapacity()) throw new ApplicationException("Número de pessoas excede a capacidade da mesa.");
     }
     static void deleteTable(Scanner scanner) {
         int number;
@@ -197,21 +216,21 @@ public class Program {
     }
 
     //Métodos auxiliares
+    static boolean checkEqualDays(Reservation reservation) {
+        List<Reservation> reservations = DaoFactory.getReservationDao().findAll();
+        for (Reservation reser:reservations) {
+            if (reser.getDate().toLocalDate().isEqual(reser.getDate().toLocalDate()) && reser.getTable().equals(reservation.getTable())) {
+                return true;
+            }
+        }
+        return false;
+    }
     static void checkDeleteReservationsThisTable(Table table) {
-        Scanner scannerStr = new Scanner(System.in);
-        String opc = "";
+        String opc;
         List<Reservation> reservations = reservationsForThisTable(table);
         if (!reservations.isEmpty()) {
             System.out.println("Existem reservas cadastradas nesta mesa! Caso prossiga elas serão apagadas.");
-            do {
-                try {
-                    System.out.println("Deseja prosseguir? (s/n)");
-                    opc = scannerStr.nextLine().toLowerCase();
-                    if (!opc.equals("s") && !opc.equals("n")) throw new ApplicationException("Digite apenas 's' para sim ou 'n' para não.");
-                } catch (ApplicationException e) {
-                    System.out.println(e.getMessage());
-                }
-            }  while(!opc.equals("s") && !opc.equals("n"));
+            opc = wantToContinue();
             if (opc.equals("s")) {
                 for (Reservation reservation:reservations) {
                     DaoFactory.getReservationDao().deleteById(reservation.getId());
@@ -228,5 +247,22 @@ public class Program {
         List<Reservation> reservations;
         reservations = DaoFactory.getReservationDao().findAll().stream().filter(r -> r.getTable().equals(table)).toList();
         return reservations;
+    }
+
+    static String wantToContinue() {
+        Scanner scannerStr = new Scanner(System.in);
+        String opc = "";
+        do {
+            try {
+                System.out.println("Deseja prosseguir? (s/n)");
+                opc = scannerStr.nextLine();
+                opc = opc.toLowerCase();
+                if (!opc.equals("s") && !opc.equals("n")) throw new ApplicationException("Digite apenas 's' para sim ou 'n' para não.");
+            } catch (ApplicationException e) {
+                System.out.println(e.getMessage());
+            }
+        }  while(!opc.equals("s") && !opc.equals("n"));
+        scannerStr.close();
+        return opc;
     }
 }

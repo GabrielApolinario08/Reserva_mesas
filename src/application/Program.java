@@ -8,6 +8,7 @@ import model.entities.Table;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -43,12 +44,16 @@ public class Program {
             } catch (DateTimeParseException e) {
                 System.out.println("\n\tErro! Digite a data e hora corretamente!");
             } finally {
-                if (opc != 9) scannerString.nextLine();
+                if (opc != 9) {
+                    System.out.println("\n\tPressione Enter para prosseguir.");
+                    scannerString.nextLine();
+                }
             }
 
         }
         DB.closeConnection();
         scanner.close();
+        scannerString.close();
     }
     static void registerTable(Scanner scanner) {
         int number, capacity;
@@ -174,8 +179,7 @@ public class Program {
         scanner.nextLine();
         if (!DaoFactory.getTableDao().existNumber(number)) throw new ApplicationException("Mesa não existente.");
         Table table = DaoFactory.getTableDao().findByNumber(number);
-        DaoFactory.getTableDao().deleteById(table.getId());
-        System.out.println("Mesa deletada com sucesso!");
+        checkDeleteReservationsThisTable(table);
     }
     static void deleteReservation(Scanner scanner) {
         int id;
@@ -190,5 +194,39 @@ public class Program {
         if (reservation == null) throw new ApplicationException("Reserva não existente.");
         DaoFactory.getReservationDao().deleteById(id);
         System.out.println("Reserva deletada com sucesso!");
+    }
+
+    //Métodos auxiliares
+    static void checkDeleteReservationsThisTable(Table table) {
+        Scanner scannerStr = new Scanner(System.in);
+        String opc = "";
+        List<Reservation> reservations = reservationsForThisTable(table);
+        if (!reservations.isEmpty()) {
+            System.out.println("Existem reservas cadastradas nesta mesa! Caso prossiga elas serão apagadas.");
+            do {
+                try {
+                    System.out.println("Deseja prosseguir? (s/n)");
+                    opc = scannerStr.nextLine().toLowerCase();
+                    if (!opc.equals("s") && !opc.equals("n")) throw new ApplicationException("Digite apenas 's' para sim ou 'n' para não.");
+                } catch (ApplicationException e) {
+                    System.out.println(e.getMessage());
+                }
+            }  while(!opc.equals("s") && !opc.equals("n"));
+            if (opc.equals("s")) {
+                for (Reservation reservation:reservations) {
+                    DaoFactory.getReservationDao().deleteById(reservation.getId());
+                }
+            } else {
+                System.out.println("A mesa não foi deletada.");
+                return;
+            }
+        }
+        DaoFactory.getTableDao().deleteById(table.getId());
+        System.out.println("Mesa deletada com sucesso!");
+    }
+    static List<Reservation> reservationsForThisTable(Table table) {
+        List<Reservation> reservations;
+        reservations = DaoFactory.getReservationDao().findAll().stream().filter(r -> r.getTable().equals(table)).toList();
+        return reservations;
     }
 }

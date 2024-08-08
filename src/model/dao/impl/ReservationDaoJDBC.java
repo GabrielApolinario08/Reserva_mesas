@@ -125,7 +125,8 @@ public class ReservationDaoJDBC implements ReservationDao {
         ResultSet rs = null;
         try {
             st = conn.prepareStatement("""
-                    SELECT reservation.*, restauranttable.* 
+                    SELECT reservation.Id AS reservationId, reservation.ClientName, reservation.ReservationDate, reservation.PeopleNumber, 
+                    restauranttable.Id AS tableId, restauranttable.Number, restauranttable.Capacity 
                     FROM reservation 
                     INNER JOIN restauranttable 
                     ON reservation.IdTable = restauranttable.Id
@@ -145,12 +146,12 @@ public class ReservationDaoJDBC implements ReservationDao {
     }
 
     private Table instanciateTable(ResultSet rs) throws SQLException{
-        return new Table(rs.getInt("Id"), rs.getInt("Number"), rs.getInt("Capacity"));
+        return new Table(rs.getInt("tableId"), rs.getInt("Number"), rs.getInt("Capacity"));
     }
 
     private Reservation instanciateReservation(ResultSet rs, Table table) throws SQLException{
         Reservation reservation = new Reservation();
-        reservation.setId(rs.getInt("Id"));
+        reservation.setId(rs.getInt("reservationId"));
         reservation.setClientName(rs.getString("ClientName"));
         reservation.setDate(rs.getTimestamp("ReservationDate").toLocalDateTime());
         reservation.setPeopleNumber(rs.getInt("PeopleNumber"));

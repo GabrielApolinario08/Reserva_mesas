@@ -4,12 +4,9 @@ import db.DB;
 import model.dao.DaoFactory;
 import model.entities.Reservation;
 import model.entities.Table;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -17,22 +14,22 @@ import java.util.Scanner;
 public class Program {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Scanner scannerString = new Scanner(System.in);
         int opc = 0;
         while (opc != 9){
             try {
                 System.out.println(UI.menu());
                 System.out.println("Escolha uma opção: ");
                 opc = scanner.nextInt();
+                scanner.nextLine();
                 if (opc < 1 || opc > 9) throw new ApplicationException("Erro! Digite um número válido!");
 
                 switch (opc) {
                     case 1 -> registerTable(scanner);
-                    case 2 -> registerReservation(scanner, scannerString);
+                    case 2 -> registerReservation(scanner);
                     case 3 -> listTables();
                     case 4 -> listReservations();
                     case 5 -> updateTable(scanner);
-                    case 6 -> uptadeReservation(scanner, scannerString);
+                    case 6 -> uptadeReservation(scanner);
                     case 7 -> deleteTable(scanner);
                     case 8 -> deleteReservation(scanner);
                     case 9 -> System.out.println("Programa encerrado com sucesso!");
@@ -47,14 +44,14 @@ public class Program {
             } finally {
                 if (opc != 9) {
                     System.out.println("\n\tPressione Enter para prosseguir.");
-                    scannerString.nextLine();
+                    scanner.nextLine();
+
                 }
             }
 
         }
         DB.closeConnection();
         scanner.close();
-        scannerString.close();
     }
     static void registerTable(Scanner scanner) {
         int number, capacity;
@@ -72,15 +69,19 @@ public class Program {
         DaoFactory.getTableDao().insert(new Table(number, capacity));
         System.out.println("Mesa cadastrada com sucesso!");
     }
-
-    static void registerReservation(Scanner scanner, Scanner scannerString) {
+    static void registerReservation(Scanner scanner) {
+        List<Table> tables = DaoFactory.getTableDao().findAll();
+        if (tables.isEmpty()) {
+            System.out.println("Não é possível cadastrar reserva, pois não há mesas cadastradas.");
+            return;
+        }
         String clientName;
         LocalDateTime reservationDate;
         int peopleNumber, tableNumber;
         System.out.print("Informe o nome do cliente: ");
-        clientName = scannerString.nextLine();
+        clientName = scanner.nextLine();
         System.out.print("Informe a data e hora da reserva (dd/mm/yyyy hh:mm): ");
-        reservationDate = LocalDateTime.parse(scannerString.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        reservationDate = LocalDateTime.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
         System.out.print("Informe o número de pessoas da reserva: ");
         peopleNumber = scanner.nextInt();
         System.out.print("Informe o número da mesa escolhida: ");
@@ -89,8 +90,8 @@ public class Program {
         Reservation reservation = new Reservation(clientName, peopleNumber, reservationDate, table);
         validatingReservation(reservation);
         if (checkEqualDays(reservation)) {
-            System.out.println("Já existe uma reserva nesta mesa e neste mesmo dia as " + reservation.getDate().format(DateTimeFormatter.ofPattern("HH:mm")) + ".");
-            String opc = wantToContinue();
+            System.out.println("Já existe uma reserva nesta mesa e neste mesmo dia.");
+            String opc = wantToContinue(scanner);
             if (opc.equals("n")) {
                 System.out.println("A reserva não foi cadastrada.");
                 return;
@@ -99,26 +100,40 @@ public class Program {
         DaoFactory.getReservationDao().insert(reservation);
         System.out.println("Reserva cadastrada com sucesso!");
     }
-
     static void listTables() {
-        System.out.println("Lista de todas as mesas: ");
         List<Table> tables = DaoFactory.getTableDao().findAll();
+        if (tables.isEmpty()) {
+            System.out.println("Nenhuma mesa cadastrada.");
+            return;
+        }
+        System.out.println("Lista de todas as mesas: ");
         for (Table table:tables) {
             System.out.println(table);
         }
     }
-
     static void listReservations() {
-        System.out.println("Lista de todas as reservas: ");
         List<Reservation> reservations = DaoFactory.getReservationDao().findAll();
+        if (reservations.isEmpty()) {
+            System.out.println("Nenhuma reserva cadastrada.");
+            return;
+        }
+        System.out.println("Lista de todas as reservas: ");
         for (Reservation reservation:reservations) {
             System.out.println(reservation);
         }
     }
-
     static void updateTable(Scanner scanner) {
         int number, capacity;
-        System.out.print("Informe o número da mesa: ");
+        List<Table> tables = DaoFactory.getTableDao().findAll();
+        if (tables.isEmpty()) {
+            System.out.println("Nenhuma mesa para ser atualizada.");
+            return;
+        }
+        System.out.println("Lista de todas as mesas: ");
+        for (Table table:tables) {
+            System.out.println(table);
+        }
+        System.out.print("Informe o número da mesa que deseja atualizar: ");
         number = scanner.nextInt();
 
         if (!DaoFactory.getTableDao().existNumber(number)) {
@@ -141,12 +156,17 @@ public class Program {
         System.out.println("Dados atualizados: ");
         System.out.println(DaoFactory.getTableDao().findById(table.getId()));
     }
-    static void uptadeReservation(Scanner scanner, Scanner scannerString) {
+    static void uptadeReservation(Scanner scanner) {
+        List<Reservation> reservations = DaoFactory.getReservationDao().findAll();
+        if (reservations.isEmpty()) {
+            System.out.println("Nenhuma reserva para ser atualizada.");
+            return;
+        }
         String clientName;
         LocalDateTime reservationDate;
         int peopleNumber, tableNumber, id;
         System.out.println("Lista de reservas: ");
-        for (Reservation reservation:DaoFactory.getReservationDao().findAll()) {
+        for (Reservation reservation:reservations) {
             System.out.println(reservation.toString(true));
         }
         System.out.print("Informe o id da reserva que deseja atualizar: ");
@@ -157,9 +177,9 @@ public class Program {
 
         System.out.println("Informe os novos dados abaixo: ");
         System.out.print("Cliente: ");
-        clientName = scannerString.nextLine();
+        clientName = scanner.nextLine();
         System.out.print("Data e hora (dd/mm/yyyy hh:mm): ");
-        reservationDate = LocalDateTime.parse(scannerString.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        reservationDate = LocalDateTime.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
         System.out.print("Número de pessoas: ");
         peopleNumber = scanner.nextInt();
         scanner.nextLine();
@@ -171,7 +191,7 @@ public class Program {
         validatingReservation(finalReservation);
         if (checkEqualDays(reservation)) {
             System.out.println("Já existe uma reserva nesta mesa e neste mesmo dia as " + reservation.getDate().format(DateTimeFormatter.ofPattern("HH:mm")) + ".");
-            String opc = wantToContinue();
+            String opc = wantToContinue(scanner);
             if (opc.equals("n")) {
                 System.out.println("A reserva não foi atualizada.");
                 return;
@@ -182,15 +202,15 @@ public class Program {
         System.out.println("Dados atualizados: ");
         System.out.println(DaoFactory.getReservationDao().findById(id));
     }
-
-    static void validatingReservation(Reservation reservation) {
-        if (reservation.getTable() == null) throw new ApplicationException("Mesa não existente.");
-        if (reservation.getPeopleNumber() > reservation.getTable().getCapacity()) throw new ApplicationException("Número de pessoas excede a capacidade da mesa.");
-    }
     static void deleteTable(Scanner scanner) {
         int number;
+        List<Table> tables = DaoFactory.getTableDao().findAll();
+        if (tables.isEmpty()) {
+            System.out.println("Nenhuma mesa para ser deletada.");
+            return;
+        }
         System.out.println("Lista de todas as mesas: ");
-        for (Table table:DaoFactory.getTableDao().findAll()) {
+        for (Table table:tables) {
             System.out.println(table);
         }
         System.out.print("Número da mesa que deseja deletar: ");
@@ -198,12 +218,17 @@ public class Program {
         scanner.nextLine();
         if (!DaoFactory.getTableDao().existNumber(number)) throw new ApplicationException("Mesa não existente.");
         Table table = DaoFactory.getTableDao().findByNumber(number);
-        checkDeleteReservationsThisTable(table);
+        checkDeleteReservationsThisTable(table, scanner);
     }
     static void deleteReservation(Scanner scanner) {
         int id;
+        List<Reservation> reservations = DaoFactory.getReservationDao().findAll();
+        if (reservations.isEmpty()) {
+            System.out.println("Nenhuma reserva para ser deletada.");
+            return;
+        }
         System.out.println("Lista de todas as reservas: ");
-        for (Reservation reservation:DaoFactory.getReservationDao().findAll()) {
+        for (Reservation reservation:reservations) {
             System.out.println(reservation.toString(true));
         }
         System.out.print("ID da reserva que deseja deletar: ");
@@ -216,6 +241,10 @@ public class Program {
     }
 
     //Métodos auxiliares
+    static void validatingReservation(Reservation reservation) {
+        if (reservation.getTable() == null) throw new ApplicationException("Mesa não existente.");
+        if (reservation.getPeopleNumber() > reservation.getTable().getCapacity()) throw new ApplicationException("Número de pessoas excede a capacidade da mesa.");
+    }
     static boolean checkEqualDays(Reservation reservation) {
         List<Reservation> reservations = DaoFactory.getReservationDao().findAll();
         for (Reservation reser:reservations) {
@@ -225,12 +254,12 @@ public class Program {
         }
         return false;
     }
-    static void checkDeleteReservationsThisTable(Table table) {
+    static void checkDeleteReservationsThisTable(Table table, Scanner scanner) {
         String opc;
         List<Reservation> reservations = reservationsForThisTable(table);
         if (!reservations.isEmpty()) {
             System.out.println("Existem reservas cadastradas nesta mesa! Caso prossiga elas serão apagadas.");
-            opc = wantToContinue();
+            opc = wantToContinue(scanner);
             if (opc.equals("s")) {
                 for (Reservation reservation:reservations) {
                     DaoFactory.getReservationDao().deleteById(reservation.getId());
@@ -248,21 +277,19 @@ public class Program {
         reservations = DaoFactory.getReservationDao().findAll().stream().filter(r -> r.getTable().equals(table)).toList();
         return reservations;
     }
-
-    static String wantToContinue() {
-        Scanner scannerStr = new Scanner(System.in);
+    static String wantToContinue(Scanner scanner) {
         String opc = "";
         do {
             try {
                 System.out.println("Deseja prosseguir? (s/n)");
-                opc = scannerStr.nextLine();
+                opc = scanner.next();
+                scanner.nextLine();
                 opc = opc.toLowerCase();
                 if (!opc.equals("s") && !opc.equals("n")) throw new ApplicationException("Digite apenas 's' para sim ou 'n' para não.");
             } catch (ApplicationException e) {
                 System.out.println(e.getMessage());
             }
-        }  while(!opc.equals("s") && !opc.equals("n"));
-        scannerStr.close();
+        } while(!opc.equals("s") && !opc.equals("n"));
         return opc;
     }
 }

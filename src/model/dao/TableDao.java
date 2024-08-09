@@ -10,6 +10,6 @@ public interface TableDao {
     void update(Table reservation);
     Table findById(int id);
     List<Table> findAll();
-    boolean existNumber(Integer number);
+    boolean existNumber(int number);
     Table findByNumber(int number);
 }

@@ -136,7 +136,7 @@ public class TableDaoJDBC implements TableDao {
     }
 
     @Override
-    public boolean existNumber(Integer number) {
+    public boolean existNumber(int number) {
         for (Table table:DaoFactory.getTableDao().findAll()) {
             if (number == table.getNumber()) {
                 return true;

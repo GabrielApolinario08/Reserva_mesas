@@ -19,7 +19,7 @@ Este projeto é um sistema de agendamento de reservas para um restaurante, desen
 # clonar repositório
 git clone https://github.com/GabrielApolinario08/Reserva_mesas.git
 
-# Configure as credenciais do banco de dados no arquivo de conexão JDBC dentro do projeto (db.properties):
+# Configure usuário e senha do banco de dados no arquivo de conexão JDBC dentro do projeto (db.properties):
 user=seu_usuario
 password=sua_senha
 dburl=jdbc:mysql://localhost:3306/reserva_mesas

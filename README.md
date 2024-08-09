@@ -17,7 +17,7 @@ Este projeto é um sistema de agendamento de reservas para um restaurante, desen
 
 ```bash
 # clonar repositório
-git clone https://github.com/devsuperior/sds1-wmazoni
+git clone https://github.com/GabrielApolinario08/Reserva_mesas.git
 
 # Configure as credenciais do banco de dados no arquivo de conexão JDBC dentro do projeto (db.properties):
 user=seu_usuario
